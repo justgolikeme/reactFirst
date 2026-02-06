@@ -3,6 +3,7 @@ import {Col,Row,Card,Table} from 'antd'
 import './home.css'
 import { getData } from '../../api'
 import * as Icon from '@ant-design/icons';
+import * as echarts from 'echarts';
 
 //table列的数据
 const columns = [
@@ -67,12 +68,35 @@ const iconToElement = (name) => React.createElement(Icon[name])
 
 const Home=()=>{
     const userImg = require("../../assets/images/user.png")
+    //dom首次渲染完成
     useEffect(()=>{
         getData().then(({data})=>{
             // console.log(data.data,'res')
             const {tableData} = data.data
             setTableData(tableData)
         })
+
+        //echarts要在dom渲染完成后才初始化
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('main'));
+        // 绘制图表
+        myChart.setOption({
+        title: {
+            text: 'ECharts 入门示例'
+        },
+        tooltip: {},
+        xAxis: {
+            data: ['衬衫', '羊毛衫', '雪纺衫', '裤子', '高跟鞋', '袜子']
+        },
+        yAxis: {},
+        series: [
+            {
+            name: '销量',
+            type: 'bar',
+            data: [5, 20, 36, 10, 10, 20]
+            }
+        ]
+        });
     },[])
     //定义table数据
     const [tableData,setTableData] = useState([])
@@ -115,6 +139,7 @@ const Home=()=>{
                         })
                     }
                 </div>
+                <div id="main" style={{height:"300px"}}></div>
             </Col>
         </Row>
     )
