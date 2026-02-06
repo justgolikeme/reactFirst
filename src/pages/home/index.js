@@ -2,6 +2,7 @@ import React,{useEffect,useState} from 'react'
 import {Col,Row,Card,Table} from 'antd'
 import './home.css'
 import { getData } from '../../api'
+import * as Icon from '@ant-design/icons';
 
 //table列的数据
 const columns = [
@@ -22,6 +23,47 @@ const columns = [
       dataIndex: 'totalBuy'
     }
   ]
+  //订单统计数据
+  const countData = [
+    {
+      "name": "今日支付订单",
+      "value": 1234,
+      "icon": "CheckCircleOutlined",
+      "color": "#2ec7c9"
+    },
+    {
+      "name": "今日收藏订单",
+      "value": 3421,
+      "icon": "ClockCircleOutlined",
+      "color": "#ffb980"
+    },
+    {
+      "name": "今日未支付订单",
+      "value": 1234,
+      "icon": "CloseCircleOutlined",
+      "color": "#5ab1ef"
+    },
+    {
+      "name": "本月支付订单",
+      "value": 1234,
+      "icon": "CheckCircleOutlined",
+      "color": "#2ec7c9"
+    },
+    {
+      "name": "本月收藏订单",
+      "value": 3421,
+      "icon": "ClockCircleOutlined",
+      "color": "#ffb980"
+    },
+    {
+      "name": "本月未支付订单",
+      "value": 1234,
+      "icon": "CloseCircleOutlined",
+      "color": "#5ab1ef"
+    }
+  ]
+  //动态获取icon
+const iconToElement = (name) => React.createElement(Icon[name])
 
 const Home=()=>{
     const userImg = require("../../assets/images/user.png")
@@ -54,7 +96,26 @@ const Home=()=>{
                     <Table rowKey={"name"} columns={columns} dataSource={tableData} pagination={false} />
                 </Card>
             </Col>
-            <Col span={16}></Col>
+            <Col span={16}>
+                <div className="num">
+                    {
+                        countData.map((item,index)=>{
+                            return(
+                                <Card key={index}>
+                                    <div className="icon-box" style={{background:item.color}}>
+                                        {iconToElement(item.icon)}
+                                    </div>
+                                    <div className="detail">
+                                        <p className="num">￥{item.value}</p>
+                                        <p className="txt">{item.name}</p>
+                                    </div>  
+                                    
+                                </Card>
+                            )
+                        })
+                    }
+                </div>
+            </Col>
         </Row>
     )
 }
