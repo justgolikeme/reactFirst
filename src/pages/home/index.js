@@ -3,7 +3,9 @@ import {Col,Row,Card,Table} from 'antd'
 import './home.css'
 import { getData } from '../../api'
 import * as Icon from '@ant-design/icons';
-import * as echarts from 'echarts';
+import MyEcharts from '../../components/Echarts'
+import Echarts from '../../components/Echarts';
+// import * as echarts from 'echarts';
 
 //table列的数据
 const columns = [
@@ -68,35 +70,57 @@ const iconToElement = (name) => React.createElement(Icon[name])
 
 const Home=()=>{
     const userImg = require("../../assets/images/user.png")
+    //创建echarts响应数据
+    const [ echartData, setEchartData] = useState({})
     //dom首次渲染完成
     useEffect(()=>{
         getData().then(({data})=>{
-            // console.log(data.data,'res')
-            const {tableData} = data.data
+            console.log(data.data,'res')
+            const {tableData, orderData } = data.data
             setTableData(tableData)
+            //对于echarts数据的组装
+            const order = orderData
+            //x轴的数据
+            const xData = order.date
+            //series数据组装
+            const keyArray = Object.keys(order.data[0])
+            const series = []
+            keyArray.forEach(key => {
+                series.push({
+                    name: key,
+                    data: order.data.map(item => item[key]),
+                    type: 'line'
+                })
+            })
+            setEchartData({
+                order: {
+                    xData,
+                    series
+                }
+            })
         })
 
-        //echarts要在dom渲染完成后才初始化
-        // 基于准备好的dom，初始化echarts实例
-        var myChart = echarts.init(document.getElementById('main'));
-        // 绘制图表
-        myChart.setOption({
-        title: {
-            text: 'ECharts 入门示例'
-        },
-        tooltip: {},
-        xAxis: {
-            data: ['衬衫', '羊毛衫', '雪纺衫', '裤子', '高跟鞋', '袜子']
-        },
-        yAxis: {},
-        series: [
-            {
-            name: '销量',
-            type: 'bar',
-            data: [5, 20, 36, 10, 10, 20]
-            }
-        ]
-        });
+        // //echarts要在dom渲染完成后才初始化
+        // // 基于准备好的dom，初始化echarts实例
+        // var myChart = echarts.init(document.getElementById('main'));
+        // // 绘制图表
+        // myChart.setOption({
+        // title: {
+        //     text: 'ECharts 入门示例'
+        // },
+        // tooltip: {},
+        // xAxis: {
+        //     data: ['衬衫', '羊毛衫', '雪纺衫', '裤子', '高跟鞋', '袜子']
+        // },
+        // yAxis: {},
+        // series: [
+        //     {
+        //     name: '销量',
+        //     type: 'bar',
+        //     data: [5, 20, 36, 10, 10, 20]
+        //     }
+        // ]
+        // });
     },[])
     //定义table数据
     const [tableData,setTableData] = useState([])
@@ -139,7 +163,8 @@ const Home=()=>{
                         })
                     }
                 </div>
-                <div id="main" style={{height:"300px"}}></div>
+                {/* <div id="main" style={{height:"300px"}}></div> */}
+                { echartData.order && <MyEcharts chartData={echartData.order} style={{height:'280px'}}/>}
             </Col>
         </Row>
     )
