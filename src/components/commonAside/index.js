@@ -9,6 +9,7 @@ import {
     VideoCameraOutlined,
   } from '@ant-design/icons';
 import { Button, Layout, Menu, theme } from 'antd';
+import { useNavigate } from 'react-router-dom';
 
 const { Header, Sider, Content } = Layout;   // 组件解构出来
 
@@ -36,8 +37,17 @@ const items = MenuConfig.map((icon=>{
 }))
 
 
-
 const CommonAside=({collapsed})=>{
+    //需要调用拿到navigate实例,菜单跳转时需要用到这个实例，navigate返回的是一个函数能跳转对应的路径
+    const navigate = useNavigate()
+
+    //点击菜单
+    const selectMenu = (e) =>{
+        //怎么样实现跳转
+        // console.log(e)
+        navigate(e.key)
+    }
+
     console.log(collapsed,'commonaside')
     return(
      <Sider trigger={null} collapsed={collapsed}>
@@ -50,6 +60,7 @@ const CommonAside=({collapsed})=>{
           style={{
               height: '100%'
           }}
+          onClick={selectMenu}
         />
       </Sider>
     )
