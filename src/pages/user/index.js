@@ -1,5 +1,5 @@
 import React,{useEffect, useState} from 'react'
-import {Button,Form,Input, Popconfirm, Table} from 'antd'
+import {Button,Form,Input, Popconfirm, Table, Modal,InputNumber, Select, DatePicker} from 'antd'
 import './user.css'
 import {getUser} from '../../api'
 const User=()=>{
@@ -7,9 +7,19 @@ const User=()=>{
         name:''
     })
     const [ tableData, setTableData ] = useState([])
-    //新增
+    //0新增 1编辑
+    const [modalType, setModalType] = useState(0)
+    const [isModalOpen, setIsModalOpen] = useState(false)
+    //创建form实例
+    const [form] = Form.useForm();
+    //按新增和编辑按钮后
     const handleClick = (type,rowData)=>{
-
+        setIsModalOpen(!isModalOpen)
+        if(type == 'add'){
+            setModalType(0)
+        }else{
+            setModalType(1)
+        }
     }
     //输入框中输入数据后按搜索会把输入框中的值返回到handleFinish的e中
     const handleFinish =(e)=>{
@@ -32,6 +42,17 @@ const User=()=>{
             setTableData(data.list)
         })
     }
+
+    //弹窗确定
+    const handleOk = () => {
+        setIsModalOpen(false);
+    };
+    //弹窗取消
+    const handleCancel = () => {
+        setIsModalOpen(false);
+    };
+
+
     const columns = [
         {
             title: '姓名',
@@ -94,6 +115,96 @@ const User=()=>{
                 </Form>
             </div>
             <Table columns={columns} dataSource={tableData} rowKey={'id'}/>
+            {/* 弹窗要做成复用性的，要根据状态来改变model的标题 */}
+            <Modal
+                open={isModalOpen}
+                title={modalType? '编辑用户' : '新增用户'}
+                onOk={handleOk}
+                onCancel={handleCancel}
+                okText="确定"
+                cancelText="取消"
+            >
+                <Form 
+                    form={form}
+                    labelCol={{
+                        span:6
+                    }}
+                    wrapperCol={{
+                        span:18
+                    }}
+                    labelAlign="left"
+                >
+                    <Form.Item
+                        label="姓名"
+                        name="name"
+                        rules={[
+                            {
+                                required:true,
+                                message:'请输入姓名'
+                            }
+                        ]}
+                    >
+                        <Input placeholder='请输入姓名'/>
+                    </Form.Item>
+                    <Form.Item
+                        label="年龄"
+                        name="age"
+                        rules={[
+                            {
+                                required:true,
+                                message:'请输入年龄'
+                            },
+                            {
+                                type:'number',
+                                message:'年龄必须是数字'
+                            }
+                        ]}
+                    >
+                        <InputNumber placeholder='请输入年龄'/>
+                    </Form.Item>
+                    <Form.Item
+                        label="性别"
+                        name="sex"
+                        rules={[
+                            {
+                                required:true,
+                                message:'性别是必选'
+                            }
+                        ]}
+                    >
+                        <Select
+                            options={[
+                                {value:0,label:'男'},
+                                {value:1,label:'女'}
+                            ]} placeholder="请选择性别"
+                        />
+                    </Form.Item>
+                    <Form.Item
+                        label="出生日期"
+                        name="birth"
+                        rules={[
+                            {
+                                required:true,
+                                message:'请选择出生日期'
+                            }
+                        ]}
+                    >
+                        <DatePicker placeholder="请选择" format="YYY/MM/DD"/>
+                    </Form.Item>
+                    <Form.Item
+                        label="地址"
+                        name="addr"
+                        rules={[
+                            {
+                                required:true,
+                                message:'请填写地址'
+                            }
+                        ]}
+                    >
+                        <Input placeholder='请输入地址'/>
+                    </Form.Item>
+                </Form>
+            </Modal>
         </div>
     )
 }
