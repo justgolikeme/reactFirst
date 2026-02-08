@@ -1,7 +1,8 @@
 import React,{useEffect, useState} from 'react'
 import {Button,Form,Input, Popconfirm, Table, Modal,InputNumber, Select, DatePicker} from 'antd'
 import './user.css'
-import {getUser} from '../../api'
+import {addUser, editUser, getUser} from '../../api'
+import dayjs from 'dayjs'
 const User=()=>{
     const [ listData, setListData ] = useState({
         name:''
@@ -19,6 +20,12 @@ const User=()=>{
             setModalType(0)
         }else{
             setModalType(1)
+            //进行深拷贝
+            console.log(rowData,"rowData")
+            const cloneData = JSON.parse(JSON.stringify(rowData))
+            cloneData.birth = dayjs(cloneData.birth)
+            //表单数据回填
+            form.setFieldsValue(cloneData)
         }
     }
     //输入框中输入数据后按搜索会把输入框中的值返回到handleFinish的e中
@@ -38,18 +45,42 @@ const User=()=>{
     //页面首次加载是通过useEffect来模拟的
     const getTableData = ()=> {
         getUser(listData).then(({data}) => {
-            // console.log(res, 'res')
+            console.log(data.list, 'res')   //列表接口有id，id代表当前数据的标识，在编辑的时候需要把标识id传给后端，后端需要通过这个id找到数据修改对应的内容
             setTableData(data.list)
         })
     }
 
     //弹窗确定
     const handleOk = () => {
-        setIsModalOpen(false);
+        //表单校验
+        form.validateFields().then( (val) => {
+            // console.log(val,"val")
+            //日期参数
+            val.birth = dayjs(val.birth).format('YYYY-MM-DD')
+            console.log(val,"newval")
+            //调接口,根据当前的状态进行判断
+            if(modalType){  //编辑是修改原数据，先找到原数据，一般是通过标识id找，后端返回当前数据时，会传给我们标识
+                editUser(val).then(() => {
+                    handleCancel()
+                    getTableData()    //更新列表的数据
+                })
+            }else{
+                //新增完成之后需要关闭弹窗,对表单的数据进行重置,然后更新列表的数据
+                addUser(val).then(() => {
+                    handleCancel()
+                    getTableData()    //更新列表的数据
+                })
+            }
+        }).catch((err) => {
+            console.log(err)
+        })
+
+        
     };
     //弹窗取消
     const handleCancel = () => {
         setIsModalOpen(false);
+        form.resetFields()
     };
 
 
@@ -104,6 +135,9 @@ const User=()=>{
         //首先实现顶部的form表单 新增的按钮
         <div className="user">
             <div className="flex-box space-between">
+                {/* 提交新增用户时，第一步需要获取当前表单的数据，第二步需要调接口实现列表数据的更新
+                获取表单的数据，是利用form属性，调用对应的api,获取当前表单输入的内容
+                执行弹窗后，点击表单确认，执行表单校验 */}
                 <Button type="primary" onClick={() => handleClick('add')}>+新增</Button>
                 <Form layout="inline" onFinish={handleFinish}>
                     <Form.Item name="keyword">
@@ -125,6 +159,7 @@ const User=()=>{
                 cancelText="取消"
             >
                 <Form 
+                    // 需要拿到form实例，传递form属性，对应的属性值需要利用钩子函数，钩子函数是antd提供的，后面就可以利用form属性调用重置的方法
                     form={form}
                     labelCol={{
                         span:6
@@ -134,6 +169,17 @@ const User=()=>{
                     }}
                     labelAlign="left"
                 >
+                    {/* rowData是没有id的，所以需要手动添加 ,如果是编辑，就显示这个表单域，点击数据提交时，就会有id数据这个字段 */}
+                    {
+                        modalType == 1 && 
+                        <Form.Item
+                        name="id"
+                        hidden
+                        >
+                            <Input/>
+                        </Form.Item>
+                    }
+
                     <Form.Item
                         label="姓名"
                         name="name"
@@ -210,3 +256,6 @@ const User=()=>{
 }
 
 export default User
+
+
+// 编辑用户时，第一步是打开弹窗的时候对原数据进行回显，然后进行修改，确定后调用编辑的接口实现列表数据的更新
