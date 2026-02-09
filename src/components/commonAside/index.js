@@ -10,6 +10,8 @@ import {
   } from '@ant-design/icons';
 import { Button, Layout, Menu, theme } from 'antd';
 import { useNavigate } from 'react-router-dom';
+import {useDispatch} from 'react-redux'
+import {selectMenuList} from '../../store/reducers/tab'
 
 const { Header, Sider, Content } = Layout;   // 组件解构出来
 
@@ -41,10 +43,38 @@ const CommonAside=({collapsed})=>{
     //需要调用拿到navigate实例,菜单跳转时需要用到这个实例，navigate返回的是一个函数能跳转对应的路径
     const navigate = useNavigate()
 
-    //点击菜单
+    //点击菜单时，需要调用reducer
+    const dispatch = useDispatch()
+
+    //创建方法添加数据到store方法，将数据设置进store里面
+    const setTabsList = (val) => {
+        dispatch(selectMenuList(val))
+    }
+
+    //点击菜单  在 CommonAside 中点击菜单时，会将菜单信息存储到 Redux
     const selectMenu = (e) =>{
         //怎么样实现跳转
-        // console.log(e)
+        console.log(e,"点击菜单返回")  //e   keyPath:['/home']
+        let data
+        MenuConfig.forEach(item => {
+            //找到当前的数据
+            if(item.path === e.keyPath[e.keyPath.length - 1]){
+                data = item
+                //如果有二级菜单  keyPath: ['/other/pageOne', '/other']
+                if(e.keyPath.length > 1){
+                    data = item.children.find(child => {   //需要将data传给commontag组件，所以涉及到兄弟间的通信，要用到rudux
+                        return child.path == e.key
+                    })
+                    console.log(data,"common aside的tag表单")   //path: '/other/pageTwo', name: 'page2', label: '页面2', icon: 'SettingOutlined'
+                }
+            }
+        })
+        // ... 查找菜单数据
+        setTabsList({  // 存储到 Redux  这里调用了 tab.js
+            path: data.path,
+            name: data.name,
+            label: data.label
+        })
         navigate(e.key)
     }
 
@@ -60,7 +90,7 @@ const CommonAside=({collapsed})=>{
           style={{
               height: '100%'
           }}
-          onClick={selectMenu}
+          onClick={selectMenu}     
         />
       </Sider>
     )

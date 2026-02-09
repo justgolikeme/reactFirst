@@ -11,6 +11,7 @@ import { Button, Layout, Menu, theme } from 'antd';
 import CommonAside from '../components/commonAside';
 import CommonHeader from '../components/commonheader';
 import {useSelector} from 'react-redux'
+import CommonTag from '../components/commonTag';
 
 const { Header, Sider, Content } = Layout;   // 组件解构出来
 
@@ -24,48 +25,10 @@ const Main=()=>{
    const collapsed = useSelector(state => state.tab.isCollapse)
     return (
       <Layout className="main-container">
-        {/* <Sider trigger={null} collapsible collapsed={collapsed}>
-          <h3 className="app-name">后台通用管理系统</h3>
-          <Menu
-            theme="dark"
-            mode="inline"
-            defaultSelectedKeys={['1']}
-            items={[
-              {
-                key: '1',
-                icon: <UserOutlined />,
-                label: 'nav 1',
-              },
-              {
-                key: '2',
-                icon: <VideoCameraOutlined />,
-                label: 'nav 2',
-              },
-              {
-                key: '3',
-                icon: <UploadOutlined />,
-                label: 'nav 3',
-              },
-            ]}
-            style={{
-                height: '100%'
-            }}
-          />
-        </Sider> */}
         <CommonAside collapsed={collapsed} />
         <Layout>
-          {/* <Header style={{ padding: 0, background: colorBgContainer }}>
-            <Button
-              type="text"
-
-              style={{
-                fontSize: '16px',
-                width: 64,
-                height: 64,
-              }}
-            />
-          </Header> */}
           <CommonHeader collapsed={collapsed}/>
+          <CommonTag />
           <Content
             style={{
               margin: '24px 16px',
