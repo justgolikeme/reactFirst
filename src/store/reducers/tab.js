@@ -11,7 +11,11 @@ const tabSlice = createSlice({
                 name: 'home',
                 label: '首页'
             }
-        ]
+        ],
+        //tag高亮显示
+        currentMenu:{
+
+        }
     },
     reducers:{
         collapseMenu: state =>{
@@ -20,18 +24,33 @@ const tabSlice = createSlice({
         // 设置菜单时，需要调用相应的reducer来设置数据
         //默认情况下拿到state，如果拿到数据，还有第二个参数，pyload起别名解构出来叫val
         selectMenuList: (state , { payload: val}) =>{
+            //选中某个路由非首页则直接赋值
+            state.currentMenu = val
             if(val.name !== 'home'){
                 //去除掉已经存在的tag
                 const ressult = state.tabList.findIndex(item => item.name === val.name)
                 if(ressult ===-1){
                     state.tabList.push(val)
                 }
+            }else if(val.name === 'home' && state.tabList.length ===1){  //是首页则默认是空就行
+                state.currentMenu = {}  
+            }
+        },
+        closeTab:(state , {payload: val}) => {
+            let res = state.tabList.findIndex(item => item.name === val.name)
+            state.tabList.splice(res, 1)
+        },
+        setCurrentMenu: (state ,{payload:val}) => {
+            if(val.name === 'home'){
+                state.currentMenu = {}
+            }else{
+                state.currentMenu = val
             }
         }
     }
 })
 
-export const {collapseMenu, selectMenuList} = tabSlice.actions
+export const {collapseMenu, selectMenuList,closeTab,setCurrentMenu} = tabSlice.actions
 export default tabSlice.reducer
 
 

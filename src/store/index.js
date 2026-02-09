@@ -3,6 +3,6 @@ import TabReducer from './reducers/tab'
 
 export default configureStore({
     reducer:{
-        tab:TabReducer
+        tab:TabReducer  // TabReducer 管理标签数据
     }
 })
