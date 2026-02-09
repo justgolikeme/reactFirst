@@ -16,12 +16,12 @@ const CommonTag = () => {
         // console.log(tabsList,"tabsList1")
         let length = tabsList.length - 1
         dispatch(closeTab(tag))
-        //关闭的是不是当前的tag
+        //关闭的不是当前的tag
         if(tag.path !== action.pathname){
             return 
         }
         if(index === length){
-            //设置当前数据
+            //设置当前数据  关闭的是最后一个标签，跳转到前一个
             const curData = tabsList[index-1]
             dispatch(setCurrentMenu(curData))
             navigate(curData.path)
@@ -44,7 +44,7 @@ const CommonTag = () => {
 
     //tag的显示
     const setTag = (flag, item, index) => {
-        return (
+        return (  // 如果是当前选中的标签flag=1
             flag ? <Tag color="#55acee" closeIcon onClose={() => handleClose(item,index)} key={item.name}>  {item.label}  </Tag>
             :
             <Tag onClick={()=>handleChange(item)} key={item.name}>  {item.label}  </Tag>
@@ -59,6 +59,10 @@ const CommonTag = () => {
             <Tag color="#55acee" closeIcon onClose={() => handleClose()}>
                 用户列表
             </Tag>    currentMenu判断当前选中的数据是否存在 currentMenu存在永远为真，所以要拿currentMenu.name属性进行判断  */}
+                {/* // 3. 调用 setTag 函数渲染每个标签
+                //    参数1：是否高亮（当前路径对比）
+                //    参数2：标签数据
+                //    参数3：标签索引（用于关闭时定位） */}
             {
                 currentMenu.name && tabsList.map((item,index) => (setTag(item.path === currentMenu.path, item,index)))
             }

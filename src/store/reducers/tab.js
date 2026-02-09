@@ -113,3 +113,17 @@ export default tabSlice.reducer
 //       </div>
 //     )
 //   }
+
+
+
+// 初始状态：
+// tabList: [首页]
+// currentMenu: {}
+
+// 点击"用户管理"后：
+// tabList: [首页, 用户管理]
+// currentMenu: { path: '/user', name: 'user', label: '用户管理' }
+
+// 点击"用户列表"后：
+// tabList: [首页, 用户管理, 用户列表]
+// currentMenu: { path: '/user/list', name: 'userList', label: '用户列表' }
