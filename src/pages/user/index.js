@@ -1,7 +1,7 @@
 import React,{useEffect, useState} from 'react'
 import {Button,Form,Input, Popconfirm, Table, Modal,InputNumber, Select, DatePicker} from 'antd'
 import './user.css'
-import {addUser, editUser, getUser} from '../../api'
+import {addUser, delUser, editUser, getUser} from '../../api'
 import dayjs from 'dayjs'
 const User=()=>{
     const [ listData, setListData ] = useState({
@@ -30,15 +30,21 @@ const User=()=>{
     }
     //输入框中输入数据后按搜索会把输入框中的值返回到handleFinish的e中
     const handleFinish =(e)=>{
-        setListData({
-            name: e.name
+        setListData({         //state数据更新的过程是异步的，用usereffect监听listdata的变化
+            name: e.keyword
         })
-        console.log(e)
+        console.log(e,"搜索框的数据")
     }
+    useEffect(() => {
+        getTableData()
+    },[listData])
 
-    //删除
-    const handleDelete = (rowData) => {
-
+    //删除,从rawData中解构出id
+    const handleDelete = ({ id }) => {
+        //调用接口做删除的逻辑
+        delUser({ id }).then(() => {
+            getTableData()
+        })
     }
     //Table分为两步，首先是获取Table数据源，然后是Table的显示效果
     //table的数据是通过接口返回的，需要在页面首次加载的时候去请求当前的数据接口
@@ -148,7 +154,7 @@ const User=()=>{
                     </Form.Item>
                 </Form>
             </div>
-            <Table columns={columns} dataSource={tableData} rowKey={'id'}/>
+            <Table style={{marginTop:'10px'}} columns={columns} dataSource={tableData} rowKey={'id'}/>
             {/* 弹窗要做成复用性的，要根据状态来改变model的标题 */}
             <Modal
                 open={isModalOpen}
@@ -173,8 +179,8 @@ const User=()=>{
                     {
                         modalType == 1 && 
                         <Form.Item
-                        name="id"
-                        hidden
+                            name="id"
+                            hidden
                         >
                             <Input/>
                         </Form.Item>
